@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Focus Builder - Productivity App</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 25%, #0f1729 50%, #1e2749 75%, #0a0e27 100%);
+            color: #f1f5f9;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(to right, #60a5fa, #a78bfa, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .header p {
+            color: #94a3b8;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        .settings-btn {
+            background: #1e293b;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .settings-btn:hover {
+            background: #334155;
+        }
+
+        /* Digital Clock */
+        .digital-clock {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(71, 85, 105, 0.5);
+            text-align: center;
+        }
+
+        .clock-time {
+            font-size: 3rem;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            color: #60a5fa;
+            margin-bottom: 0.5rem;
+            letter-spacing: 4px;
+            text-shadow: 0 0 20px rgba(96, 165, 250, 0.5);
+        }
+
+        .clock-date {
+            color: #94a3b8;
+            font-size: 0.875rem;
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        /* Grid Layout */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        /* Mode Selector */
+        .mode-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: none;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(30, 41, 59, 0.5);
+            color: #94a3b8;
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        .mode-btn.active {
+            background: #2563eb;
+            color: white;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+        }
+
+        .mode-btn:hover:not(.active) {
+            background: rgba(51, 65, 85, 0.5);
+        }
+
+        /* Timer Card */
+        .timer-card {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 2rem;
+            padding: 3rem;
+            border: 1px solid rgba(71, 85, 105, 0.5);
+            text-align: center;
+        }
+
+        .timer-display {
+            font-size: 6rem;
+            font-family: 'Orbitron', monospace;
+            font-weight: 900;
+            background: linear-gradient(to right, #60a5fa, #a78bfa, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2rem;
+            letter-spacing: 8px;
+            text-shadow: 0 0 30px rgba(96, 165, 250, 0.3);
+        }
+
+        /* Liquid Tank */
+        .liquid-tank {
+            position: relative;
+            width: 200px;
+            height: 300px;
+            margin: 0 auto 2rem;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 2rem;
+            border: 4px solid #334155;
+            overflow: hidden;
+        }
+
+        .tank-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            font-size: 4rem;
+            color: #475569;
+        }
+
+        .liquid {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, #3b82f6, #60a5fa, #7dd3fc);
+            transition: height 0.3s ease-out;
+            height: 0%;
+        }
+
+        .liquid::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, transparent, rgba(255, 255, 255, 0.2));
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .control-btn {
+            padding: 1.5rem;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .play-btn {
+            background: #2563eb;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+        }
+
+        .play-btn:hover {
+            background: #1d4ed8;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.5);
+        }
+
+        .reset-btn {
+            background: #334155;
+        }
+
+        .reset-btn:hover {
+            background: #475569;
+        }
+
+        /* Stats Cards */
+        .stats-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .stat-card {
+            padding: 1.5rem;
+            border-radius: 1.5rem;
+            border: 1px solid rgba(71, 85, 105, 0.5);
+        }
+
+        .streak-card {
+            background: linear-gradient(135deg, #ea580c, #dc2626);
+            box-shadow: 0 10px 30px rgba(234, 88, 12, 0.3);
+        }
+
+        .stat-card h3 {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+            font-family: 'Orbitron', monospace;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            opacity: 0.9;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        .focus-card, .sessions-card {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .focus-card .stat-value {
+            color: #60a5fa;
+        }
+
+        .sessions-card .stat-value {
+            color: #4ade80;
+        }
+
+        .motivation-card {
+            background: linear-gradient(135deg, rgba(147, 51, 234, 0.2), rgba(236, 72, 153, 0.2));
+            border: 1px solid rgba(147, 51, 234, 0.3);
+            padding: 1.5rem;
+            border-radius: 1.5rem;
+            text-align: center;
+        }
+
+        .motivation-card p {
+            font-style: italic;
+            color: #d1d5db;
+            font-size: 0.875rem;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1e293b;
+            border-radius: 2rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 100%;
+            border: 2px solid #dc2626;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #ef4444;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        .modal-text {
+            color: #d1d5db;
+            margin-bottom: 0.5rem;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        .modal-warning {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #ef4444;
+            margin-bottom: 1.5rem;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        .danger-btn {
+            background: #dc2626;
+        }
+
+        .danger-btn:hover {
+            background: #b91c1c;
+        }
+
+        .cancel-btn {
+            background: #334155;
+        }
+
+        .cancel-btn:hover {
+            background: #475569;
+        }
+
+        /* Settings Modal */
+        .settings-modal .modal-content {
+            border-color: #475569;
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .settings-header h2 {
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: #f1f5f9;
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+
+        .settings-group {
+            margin-bottom: 1rem;
+        }
+
+        .settings-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        .settings-group input {
+            width: 100%;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: #f1f5f9;
+            font-size: 1rem;
+            font-family: 'Orbitron', monospace;
+        }
+
+        .settings-group input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .save-btn {
+            width: 100%;
+            padding: 0.75rem 1.5rem;
+            background: #2563eb;
+            border: none;
+            border-radius: 0.75rem;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        .save-btn:hover {
+            background: #1d4ed8;
+        }
+
+        /* Icons */
+        .icon {
+            width: 24px;
+            height: 24px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .icon-lg {
+            width: 32px;
+            height: 32px;
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .timer-display {
+                font-size: 4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1>Focus Builder</h1>
+                <p>Stay focused, build your streak</p>
+            </div>
+            <button class="settings-btn" onclick="openSettings()">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M12 1v6m0 6v6m0-6h6m-6 0H6m12-7.07l-4.24 4.24M10.24 13.76L6 18m12-12L13.76 10.24M10.24 13.76L6 18"></path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Digital Clock -->
+        <div class="digital-clock">
+            <div class="clock-time" id="clockTime">00:00:00</div>
+            <div class="clock-date" id="clockDate">Loading...</div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Timer Section -->
+            <div>
+                <!-- Mode Selector -->
+                <div class="mode-selector">
+                    <button class="mode-btn active" onclick="changeMode('pomodoro')">Pomodoro</button>
+                    <button class="mode-btn" onclick="changeMode('shortBreak')">Short Break</button>
+                    <button class="mode-btn" onclick="changeMode('longBreak')">Long Break</button>
+                    <button class="mode-btn" onclick="changeMode('custom')">Custom</button>
+                </div>
+
+                <!-- Timer Card -->
+                <div class="timer-card">
+                    <div class="timer-display" id="timerDisplay">25:00</div>
+
+                    <!-- Liquid Tank -->
+                    <div class="liquid-tank">
+                        <div class="tank-icon">💧</div>
+                        <div class="liquid" id="liquidFill"></div>
+                    </div>
+
+                    <!-- Controls -->
+                    <div class="controls">
+                        <button class="control-btn play-btn" onclick="toggleTimer()">
+                            <svg class="icon icon-lg" id="playIcon" viewBox="0 0 24 24">
+                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                            </svg>
+                        </button>
+                        <button class="control-btn reset-btn" onclick="resetTimer()">
+                            <svg class="icon icon-lg" viewBox="0 0 24 24">
+                                <polyline points="1 4 1 10 7 10"></polyline>
+                                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Section -->
+            <div class="stats-section">
+                <!-- Streak Card -->
+                <div class="stat-card streak-card">
+                    <h3>
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path>
+                        </svg>
+                        Current Streak
+                    </h3>
+                    <div class="stat-value" id="streakValue">0</div>
+                    <div class="stat-label">sessions completed</div>
+                </div>
+
+                <!-- Focus Time Card -->
+                <div class="stat-card focus-card">
+                    <h3>
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        Total Focus Time
+                    </h3>
+                    <div class="stat-value" id="focusTime">0h 0m</div>
+                    <div class="stat-label">time without distractions</div>
+                </div>
+
+                <!-- Sessions Card -->
+                <div class="stat-card sessions-card">
+                    <h3>
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                        </svg>
+                        Sessions Today
+                    </h3>
+                    <div class="stat-value" id="sessionsValue">0</div>
+                    <div class="stat-label">completed sessions</div>
+                </div>
+
+                <!-- Motivation -->
+                <div class="motivation-card">
+                    <p>"Focus on being productive insted of busy !"</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Warning Modal -->
+    <div class="modal" id="warningModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path>
+                </svg>
+                Break Your Streak?
+            </div>
+            <p class="modal-text">You're in the middle of a focus session!</p>
+            <p class="modal-warning">Stopping now will RESET your <span id="modalStreak">0</span> session streak!</p>
+            <div class="modal-actions">
+                <button class="modal-btn danger-btn" onclick="confirmReset(true)">Reset & Lose Streak</button>
+                <button class="modal-btn cancel-btn" onclick="closeWarning()">Continue Session</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal settings-modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="settings-header">
+                <h2>Settings</h2>
+                <button class="close-btn" onclick="closeSettings()">✕</button>
+            </div>
+            <div class="settings-group">
+                <label>Custom Timer (minutes)</label>
+                <input type="number" id="customMinutes" value="25" min="1" max="120">
+            </div>
+            <button class="save-btn" onclick="saveSettings()">Save Settings</button>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let timeRemaining = 25 * 60;
+        let isActive = false;
+        let mode = 'pomodoro';
+        let streak = 0;
+        let totalFocusTime = 0;
+        let sessionsCompleted = 0;
+        let customMinutes = 25;
+        let interval = null;
+
+        const modes = {
+            pomodoro: 25 * 60,
+            shortBreak: 5 * 60,
+            longBreak: 15 * 60,
+            custom: 25 * 60
+        };
+
+        // Initialize
+        updateDisplay();
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        // Timer Functions
+        function toggleTimer() {
+            if (!isActive && timeRemaining === 0) {
+                timeRemaining = modes[mode];
+            }
+            
+            isActive = !isActive;
+            
+            const playIcon = document.getElementById('playIcon');
+            if (isActive) {
+                playIcon.innerHTML = '<line x1="10" y1="5" x2="10" y2="19"></line><line x1="14" y1="5" x2="14" y2="19"></line>';
+                startTimer();
+            } else {
+                playIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"></polygon>';
+                stopTimer();
+            }
+        }
+
+        function startTimer() {
+            interval = setInterval(() => {
+                timeRemaining--;
+                updateDisplay();
+                updateLiquid();
+                
+                if (timeRemaining <= 0) {
+                    completeSession();
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(interval);
+        }
+
+        function resetTimer() {
+            if (isActive && timeRemaining > 0) {
+                document.getElementById('modalStreak').textContent = streak;
+                document.getElementById('warningModal').classList.add('active');
+            } else {
+                confirmReset(false);
+            }
+        }
+
+        function confirmReset(loseStreak) {
+            stopTimer();
+            isActive = false;
+            timeRemaining = modes[mode];
+            
+            if (loseStreak) {
+                streak = 0;
+                updateStats();
+            }
+            
+            document.getElementById('liquidFill').style.height = '0%';
+            updateDisplay();
+            closeWarning();
+            
+            const playIcon = document.getElementById('playIcon');
+            playIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"></polygon>';
+        }
+
+        function completeSession() {
+            stopTimer();
+            isActive = false;
+            streak++;
+            sessionsCompleted++;
+            totalFocusTime += modes[mode];
+            
+            timeRemaining = modes[mode];
+            updateDisplay();
+            updateStats();
+            
+            const playIcon = document.getElementById('playIcon');
+            playIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"></polygon>';
+            
+            // Play sound (basic beep)
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+
+        function changeMode(newMode) {
+            if (isActive) return;
+            
+            mode = newMode;
+            timeRemaining = modes[mode];
+            document.getElementById('liquidFill').style.height = '0%';
+            updateDisplay();
+            
+            // Update active button
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        // Display Functions
+        function updateDisplay() {
+            const mins = Math.floor(timeRemaining / 60);
+            const secs = timeRemaining % 60;
+            document.getElementById('timerDisplay').textContent = 
+                `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        function updateLiquid() {
+            if (isActive) {
+                const progress = ((modes[mode] - timeRemaining) / modes[mode]) * 100;
+                document.getElementById('liquidFill').style.height = progress + '%';
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('streakValue').textContent = streak;
+            document.getElementById('sessionsValue').textContent = sessionsCompleted;
+            
+            const hours = Math.floor(totalFocusTime / 3600);
+            const mins = Math.floor((totalFocusTime % 3600) / 60);
+            document.getElementById('focusTime').textContent = `${hours}h ${mins}m`;
+        }
+
+        function updateClock() {
+            const now = new Date();
+            
+            const time = now.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            });
+            
+            const date = now.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            document.getElementById('clockTime').textContent = time;
+            document.getElementById('clockDate').textContent = date;
+        }
+
+        // Modal Functions
+        function closeWarning() {
+            document.getElementById('warningModal').classList.remove('active');
+        }
+
+        function openSettings() {
+            document.getElementById('settingsModal').classList.add('active');
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsModal').classList.remove('active');
+        }
+
+        function saveSettings() {
+            const input = document.getElementById('customMinutes');
+            customMinutes = Math.max(1, Math.min(120, parseInt(input.value) || 25));
+            modes.custom = customMinutes * 60;
+            
+            if (mode === 'custom') {
+                timeRemaining = modes.custom;
+                updateDisplay();
+            }
+            
+            closeSettings();
+        }
+    </script>
+</body>
+</html>
